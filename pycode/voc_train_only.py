@@ -6,6 +6,8 @@ from read_conf import config
 from sklearn import linear_model
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn import svm
 
 '''
 1.根据trainingset抽取出词表voclist
@@ -16,17 +18,14 @@ ps:突然发现，如果用nltk，训练前不用自己抽词表，只要按照�
 2.根据词表，将training的文章word_seg出来，转化成seg_word_list
 3.利用nltk将文章_词矩阵转化成tf-idf矩阵，记得记录类别vector
 4.训练，然后将同理得到的test文章进行预测
-'''
 
-'''
 Q1:voclist只包含trainingset
 yes!regardless of the missing ones.
 Q2:全集同的情况下，然后对于不同的word_seg_list，最后得到的词频矩阵的feat顺序是一样的么？
 yes! the same order!
-'''
-
-'''
 sklearn出来的稀疏存储可以直接用的哦～应该-应该！
+
+Get the word_set and learn to build sparse matrix to generate the vector without add the totalvector!
 '''
 
 #路径以及分类字典，都写成conf型，暂时dict先不写啦，直接给出了
@@ -126,6 +125,13 @@ if __name__ == "__main__":
     logreg = linear_model.LogisticRegression(penalty='l2')
     logreg.fit(train_matrix,train_cat)
     test_pre = logreg.predict(test_matrix)
+    #neigh = KNeighborsClassifier(n_neighbors=1)
+    #neigh.fit(train_matrix,train_cat)
+    #test_pre = neigh.predict(test_matrix)
+    #clf = svm.SVC()
+    #clf.fit(train_matrix,train_cat)
+    #test_pre = clf.predict(test_matrix)
+
     succ_num = 0
     for i in range(len(test_cat)):
         if test_cat[i] == test_pre[i]:
