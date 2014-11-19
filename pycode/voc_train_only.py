@@ -8,6 +8,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn import svm
+from sklearn.decomposition import PCA
 
 '''
 1.根据trainingset抽取出词表voclist
@@ -47,7 +48,7 @@ def doc_to_voclist(tr_path):
     train_cat = []
     for dd in docdir_list:
         file_list = os.listdir(tr_path+dd)
-        print "start to handle the -->   "+dd+"   <-- directory..\n"
+        print "start to handle the -->   "+dd+"   <-- directory.."
         for fpath in file_list:
             #get all the filepath start to handle the document, remember to close it.
             d_path = tr_path+dd+'/'+fpath
@@ -88,7 +89,7 @@ def test_handle(word_list,tr_path):
     test_cat = []
     for dd in docdir_list:
         file_list = os.listdir(tr_path+dd)
-        print "handling the --->   "+dd+"   <--- directory..\n"
+        print "handling the --->   "+dd+"   <--- directory.."
         for fpath in file_list:
             d_path = tr_path + dd + '/' + fpath
             with open(d_path,"rb") as text_file:
@@ -121,21 +122,30 @@ def test_handle(word_list,tr_path):
 if __name__ == "__main__":
     #处理trainingset获得wordset
     word_set,train_matrix,train_cat = doc_to_voclist(train_path)
-    test_matrix,test_cat = test_handle(word_set,test_path)
-    logreg = linear_model.LogisticRegression(penalty='l2')
-    logreg.fit(train_matrix,train_cat)
-    test_pre = logreg.predict(test_matrix)
+    print "%s"%len(word_set)
+    #test_matrix,test_cat = test_handle(word_set,test_path)
+    #logreg = linear_model.LogisticRegression(C=1.0,penalty='l2')
+    #logreg.fit(train_matrix,train_cat)
+    #test_pre = logreg.predict(test_matrix[:-1,:])
     #neigh = KNeighborsClassifier(n_neighbors=1)
     #neigh.fit(train_matrix,train_cat)
     #test_pre = neigh.predict(test_matrix)
-    #clf = svm.SVC()
-    #clf.fit(train_matrix,train_cat)
-    #test_pre = clf.predict(test_matrix)
-
+    '''
+    print "\n start to fit..."
+    pca = PCA(n_components = 100)
+    pca.fit(train_matrix)
+    train_pca = pca.transform(train_matrix)
+    test_pca = pca.transform(test_matrix)
+    clf = svm.SVC()
+    clf.fit(train_pca,train_cat)
+    test_pre = clf.predict(test_pca)
+    '''
+    '''
     succ_num = 0
-    for i in range(len(test_cat)):
+    for i in range(len(test_pre)):
         if test_cat[i] == test_pre[i]:
             succ_num += 1
     print succ_num
     print "  succ  in  "
     print len(test_cat)
+    '''

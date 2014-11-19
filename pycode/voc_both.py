@@ -163,11 +163,11 @@ if __name__ == "__main__":
     #处理trainingset获得wordset
     word_set,train_matrix,train_cat = doc_to_voclist(train_path,test_path)
     test_matrix,test_cat = test_handle(word_set,test_path)
-    logreg = linear_model.LogisticRegression(penalty='l2')
-    logreg.fit(train_matrix,train_cat)
-    test_pre = logreg.predict(test_matrix)
+    logreg = linear_model.LogisticRegression(penalty='l1')
+    logreg.fit(train_matrix[:-1,:],train_cat[:-1])
+    test_pre = logreg.predict(test_matrix[:-1,:])
     succ_num = 0
-    for i in range(len(test_cat)):
+    for i in range(len(test_cat)-1):
         if test_cat[i] == test_pre[i]:
             succ_num += 1
     print succ_num
