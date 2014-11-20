@@ -56,9 +56,17 @@ def get_set(doc_num,num_set):
     for idx in word_set:
         word_set[idx].get_docs()
         word_set[idx].get_widf(doc_num)
+        word_set[idx].get_s(doc_num,num_set)
     return word_set
 
+def set_save(word_set,N):
+    tmp_set = {}
+    for idx in word_set:
+        tmp_set[idx] = word_set[idx].get_svalue()
+    tmp_tuple = sorted(tmp_tuple.iteritems(),key=lambda asd:asd[1],reverse=True)
+    #sorted 后变成tuple元祖了,tmp_tuple[i][0]存起来就好了
+    num_save = min(N,len(word_set))
 
 if __name__ == "__main__":
-        num_set,doc_num = get_num()
+	num_set,doc_num = get_num()
 	word_set = get_set(doc_num,num_set)

@@ -11,20 +11,24 @@ class word:
         self.__w_cat_dict = w_cat_dict
 
     def get_s(self,doc_num,num_set):
-		H = -10*(1.0/10)*log(1.0/10)
+		H = -10*(1.0/10)*log(1.0/10,2)
 		p1 = self.__w_docs*1.0 / doc_num
 		p2 = 1 - p1
-		H1 = 
-		H2 = 0
-		p11 = 0
-		p22 = 0
+		H1 = 0.0
+		H2 = 0.0
 		for idx in self.__w_cat_dict:
-			p11 += self.__w_cat_dict[idx]*1.0 / self.__w_docs
-			H1 += p11*log(p11)
-			p22 += (num_set[idx]-self.__w_cat_dict[idx])*1.0 / (doc_num-self.__w_docs)
-			H2 += p22*log(p22)
+			p11 = self.__w_cat_dict[idx]*1.0 / self.__w_docs
+			H1 += p11*log(p11,2)
+			p22 = (num_set[idx]-self.__w_cat_dict[idx])*1.0 / (doc_num-self.__w_docs)
+			H2 += p22*log(p22,2)
 		self.__w_s = H + p1*H1 + p2*H2
 		return self.__w_s
+
+    def get_svalue(self):
+        return self.__w_s
+
+    def get_docs_num(self):
+        return self.__w_docs
 
     def update_dict(self,cat_str):
         if cat_str in self.__w_cat_dict:
