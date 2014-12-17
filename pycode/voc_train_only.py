@@ -1,4 +1,6 @@
 #coding=utf-8
+
+import pickle
 import os
 import nltk
 import csv
@@ -64,20 +66,19 @@ def doc_to_voclist(tr_path):
 def doc_handle(voclist,doc_matrix,doc_cat,docpath,cat):
     with open(docpath,"rb") as text_file:
         fl = text_file.readlines()
-        porter = nltk.PorterStemmer()
+        str_tmp = ''
         for doc_line in fl:
-            str_tmp = ''
             #tokens = nltk.word_tokenize(doc_line)
             pattern = r'''[a-zA-Z]+'''
-            doc_cat.append(cat_dic[cat])
             #tokens for set but besides for the seg_matrix.
             tokens = nltk.regexp_tokenize(doc_line,pattern)
             for t in tokens:
                 str_tmp += t.lower()
                 str_tmp += ' '
-            doc_matrix.append(str_tmp)
             words = set([t.lower() for t in tokens])
             voclist = voclist | words
+        doc_cat.append(cat_dic[cat])
+        doc_matrix.append(str_tmp)
     text_file.close()
     return voclist,doc_matrix,doc_cat
 
@@ -119,33 +120,31 @@ def test_handle(word_list,tr_path):
     test_matrix = tfidf.fit_transform(doc_m)
     return test_matrix,test_cat
 
+def save_matrix(path,matrix):
+    outfile = open(path,'wb')
+    pickle.dump(matrix,outfile,True)
+
 if __name__ == "__main__":
     #处理trainingset获得wordset
     word_set,train_matrix,train_cat = doc_to_voclist(train_path)
+    save_matrix(t_path['train_matrix'],train_matrix)
+    save_matrix(t_path['train_cat'],train_cat)
+    test_matrix,test_cat = test_handle(word_set,test_path)
+    save_matrix(t_path['test_matrix'],test_matrix[:-1,:])
+    save_matrix(t_path['test_cat'],test_cat[:-1])
+    print len(test_cat)
+    print len(train_cat)
     print "%s"%len(word_set)
-    #test_matrix,test_cat = test_handle(word_set,test_path)
-    #logreg = linear_model.LogisticRegression(C=1.0,penalty='l2')
-    #logreg.fit(train_matrix,train_cat)
-    #test_pre = logreg.predict(test_matrix[:-1,:])
-    #neigh = KNeighborsClassifier(n_neighbors=1)
+    logreg = linear_model.LogisticRegression()
+    logreg.fit(train_matrix,train_cat)
+    test_pre = logreg.predict(test_matrix[:-1,:])
+    #neigh = KNeighborsClassifier(n_neighbors=8)
     #neigh.fit(train_matrix,train_cat)
-    #test_pre = neigh.predict(test_matrix)
-    '''
-    print "\n start to fit..."
-    pca = PCA(n_components = 100)
-    pca.fit(train_matrix)
-    train_pca = pca.transform(train_matrix)
-    test_pca = pca.transform(test_matrix)
-    clf = svm.SVC()
-    clf.fit(train_pca,train_cat)
-    test_pre = clf.predict(test_pca)
-    '''
-    '''
+    #test_pre = neigh.predict(test_matrix[:-1,:])
     succ_num = 0
     for i in range(len(test_pre)):
         if test_cat[i] == test_pre[i]:
             succ_num += 1
     print succ_num
     print "  succ  in  "
-    print len(test_cat)
-    '''
+    print len(test_cat[:-1])

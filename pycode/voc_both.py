@@ -103,20 +103,20 @@ def vocset_init(vocset,te_path):
 def doc_handle(voclist,doc_matrix,doc_cat,docpath,cat):
     with open(docpath,"rb") as text_file:
         fl = text_file.readlines()
+        str_tmp = ''
         #porter = nltk.PorterStemmer()
         for doc_line in fl:
-            str_tmp = ''
             #tokens = nltk.word_tokenize(doc_line)
             pattern = r'''[a-zA-Z]+'''
-            doc_cat.append(cat_dic[cat])
             #tokens for set but besides for the seg_matrix.
             tokens = nltk.regexp_tokenize(doc_line,pattern)
             for t in tokens:
                 str_tmp += t.lower()
                 str_tmp += ' '
-            doc_matrix.append(str_tmp)
             words = set([t.lower() for t in tokens])
             voclist = voclist | words
+        doc_matrix.append(str_tmp)
+        doc_cat.append(cat_dic[cat])
     text_file.close()
     return voclist,doc_matrix,doc_cat
 
@@ -163,7 +163,7 @@ if __name__ == "__main__":
     #处理trainingset获得wordset
     word_set,train_matrix,train_cat = doc_to_voclist(train_path,test_path)
     test_matrix,test_cat = test_handle(word_set,test_path)
-    logreg = linear_model.LogisticRegression(penalty='l1')
+    logreg = linear_model.LogisticRegression(penalty='l2')
     logreg.fit(train_matrix[:-1,:],train_cat[:-1])
     test_pre = logreg.predict(test_matrix[:-1,:])
     succ_num = 0

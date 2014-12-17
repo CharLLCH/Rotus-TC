@@ -12,6 +12,7 @@ cat_dic = {'acq':0,'corn':1,'crude':2,'earn':3,'grain':4,'interest':5,'money-fx'
 t_path = config("../conf/dp.conf")
 train_path = t_path["train_path"]
 test_path = t_path["test_path"]
+wordset_path = t_path["wordset_path"]
 
 stopword = stop_set(t_path["stopword_path"])
 pattern = r'''[a-zA-Z]+'''
@@ -63,10 +64,20 @@ def set_save(word_set,N):
     tmp_set = {}
     for idx in word_set:
         tmp_set[idx] = word_set[idx].get_svalue()
-    tmp_tuple = sorted(tmp_tuple.iteritems(),key=lambda asd:asd[1],reverse=True)
+    #dict sorted..
+    tmp_tuple = sorted(tmp_set.iteritems(),key=lambda asd:asd[1],reverse=True)
+    x_tmp = []
     #sorted 后变成tuple元祖了,tmp_tuple[i][0]存起来就好了
     num_save = min(N,len(word_set))
+    for i in xrange(num_save):
+        x_tmp.append(tmp_tuple[i][0])
+    with open(wordset_path,'wb') as csv_file:
+        w_ter = csv.writer(csv_file)
+        w_ter.writerow(x_tmp)
+    csv_file.close()
+
 
 if __name__ == "__main__":
 	num_set,doc_num = get_num()
 	word_set = get_set(doc_num,num_set)
+        set_save(word_set,3000)
