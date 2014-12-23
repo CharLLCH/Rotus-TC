@@ -44,23 +44,25 @@ class LogisticRegression(object):
 
     def predict(self,x):
         w = self.w
-        wx = x * w
+        wx = np.dot(x,w)
         if self.C == 1:
             for i in xrange(x.shape[0]):
-                wx[i,0] = 1./(1.+exp(-max(min(wx[i,0],35.),-35.)))
+                #wx[i,0] = 1./(1.+exp(-max(min(wx[i,0],35.),-35.)))
+                wx[i,0] = 1./(1.+exp(-wx[i]))
         else:
             for i in xrange(wx.shape[0]):
                 for j in xrange(wx.shape[1]):
-                    #wx[i,j] = 1./(1.+exp(-wx[i,j]))
-                    wx[i,j] = 1. / (1. + exp(-max(min(wx[i,j],35.),-35)))
+                    #wx[i,j] = 1. / (1. + exp(-max(min(wx[i,j],35.),-35)))
+                    wx[i,j] = 1. / (1. + exp(-wx[i,j]))
         return wx
 
     def update(self,x,y,p):
         w = self.w
         g = self.g
         #p = self.predict(x)
-        g = x.transpose() * (p - y)
-        w -= self.rate * g
+        #g = x.transpose() * (p - y)
+        g = np.dot(x.transpose(),(p-y))
+        w -= (self.rate * 1. / x.shape[0]) * g
 
 def log_loss(p,y):
     logloss = 0.
