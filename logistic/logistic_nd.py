@@ -80,16 +80,6 @@ def get_matrix(path):
     tmp_matrix = pickle.load(infile)
     return tmp_matrix
 
-def rebuild(tr_cat):
-    if set(tr_cat) == 2:
-        return np.matrix(np.array(tr_cat).reshape(len(tr_cat),1))
-    else:
-        c = len(set(tr_cat))
-        tmp = np.array([0.]*len(tr_cat)*c).reshape(len(tr_cat),c)
-        for idx in xrange(len(tr_cat)):
-            tmp[idx][tr_cat[idx]] = 1.
-        return np.matrix(tmp)
-
 def get_pred(pred):
     y_list = []
     for n_idx in xrange(pred.shape[0]):
@@ -112,12 +102,3 @@ def get_acc(pred,te):
             
 
 if __name__ == "__main__":
-    tr_matrix = np.matrix(get_matrix(data_path['train_matrix']).toarray())
-    tr_cat = rebuild(get_matrix(data_path['train_cat']))
-    logreg = LogisticRegression(0.5,0,0)
-    logreg.fit(tr_matrix,tr_cat)
-    te_matrix = np.matrix(get_matrix(data_path['test_matrix']).toarray())
-    te_cat = get_matrix(data_path['test_cat'])
-    pred_y = logreg.predict(te_matrix)
-    pred_list = get_pred(pred_y)
-    get_acc(pred_list,te_cat)
